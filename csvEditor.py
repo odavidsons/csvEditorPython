@@ -160,8 +160,8 @@ topLabel.bind("<Button-1>", lambda e: callback("https://github.com/odavidsons"))
 #Render container and canvas for the datatable
 container = tk.Frame(master)
 canvas = tk.Canvas(container, width=1000, height=600)
-vscrollbar = tk.Scrollbar(container, orient="vertical", command=canvas.yview)
-hscrollbar = tk.Scrollbar(container, orient="horizontal", command=canvas.xview)
+vscrollbar = tk.Scrollbar(master, orient="vertical", command=canvas.yview)
+hscrollbar = tk.Scrollbar(master, orient="horizontal", command=canvas.xview)
 scrollable_frame = tk.Frame(canvas)
 
 #Bind the scrollregion to the frame
