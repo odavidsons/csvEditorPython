@@ -91,9 +91,13 @@ def newTableInput():
     global sizeSelection
 
     if len(canvas.find_all()) == 0:
-        #Elements for the input information
+        #Create new window
         sizeSelection = tk.Toplevel(master)
         sizeSelection.minsize(200,100)
+        win_x = master.winfo_rootx() + 400
+        win_y = master.winfo_rooty() + 100
+        sizeSelection.geometry(f'+{win_x}+{win_y}')
+        #Elements for the input information
         label1 = tk.Label(sizeSelection,text="Select the table size")
         label1.grid(row=0,column=0,columnspan=2)
         labelWidth = tk.Label(sizeSelection,text="Width: ")
