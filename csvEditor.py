@@ -20,15 +20,14 @@ def chooseFile():
         title='Open a file',
         initialdir='/home/dsantos/Documentos',
         filetypes=filetypes)
-
-    importFileData(filename)
+    if len(filename) > 0: importFileData(filename)
 
 #Read the imported CSV file and render the data into the datatable
 def importFileData(filename):
     global tableCells,header
     
     if len(tableCells) == 0:
-        #Render the table canvas
+        #Create the table canvas
         canvas.create_window(0, 0, window=scrollable_frame, anchor="nw")
         canvas.configure(yscrollcommand=vscrollbar.set)
         canvas.configure(xscrollcommand=hscrollbar.set)
@@ -56,7 +55,9 @@ def importFileData(filename):
                     cell.grid(row=row_count+3,column=j)
                     tableCells[row_count][j] = cell
                 row_count = row_count+1
-    else: errorLabel.config(text="Clear the loaded file first!")
+    else: 
+        errorLabel.config(text="Clear the loaded file first!")
+        tk.messagebox.showwarning(message="Clear the loaded file first!")
 
 def exportFileData(filename):
     if filename != "":
@@ -77,12 +78,48 @@ def exportFileData(filename):
         tk.messagebox.showinfo("Information","File exported successfully!")
     else: errorLabel.config(text="You haven't imported a file yet!",foreground="red")
 
+#Create a window the inputing the value for the new table size
+def newTableInput():
+    global sizeSelection
+
+    #Elements for the input information
+    sizeSelection = tk.Toplevel(master)
+    sizeSelection.minsize(200,100)
+    label1 = tk.Label(sizeSelection,text="Select the table size")
+    label1.grid(row=0,column=0,columnspan=2)
+    labelWidth = tk.Label(sizeSelection,text="Width: ")
+    labelWidth.grid(row=1,column=0)
+    widthInput = tk.Entry(sizeSelection)
+    widthInput.grid(row=1,column=1,padx=5,pady=5)
+    labelHeight = tk.Label(sizeSelection,text="Height: ")
+    labelHeight.grid(row=2,column=0)
+    heightInput = tk.Entry(sizeSelection)
+    heightInput.grid(row=2,column=1)
+    confirmBtn = tk.Button(sizeSelection,text="Ok",command=lambda: newTableRender(heightInput.get(),widthInput.get()))
+    confirmBtn.grid(row=3,column=0,columnspan=2)
+
+#Render a new table with the specified size
+def newTableRender(height,width):
+    try:
+        #Create the table canvas
+        canvas.create_window(0, 0, window=scrollable_frame, anchor="nw")
+        canvas.configure(yscrollcommand=vscrollbar.set)
+        canvas.configure(xscrollcommand=hscrollbar.set)
+        #Render the cells
+        for i in range(int(height)):
+            for j in range(int(width)):
+                cell = tk.Entry(scrollable_frame)
+                cell.grid(row=i+3,column=j)
+        sizeSelection.destroy()
+    except ValueError: tk.messagebox.showwarning(message="Please enter a valid number")
+
+
 def clearTable():
     global tableCells
 
     canvas.delete('all')
     tableCells = []
-    errorLabel.config(text="Table cleared!")
+    errorLabel.config(text="Table cleared!",foreground="black")
 
 #Main program
 filename = ""
@@ -95,6 +132,7 @@ master.title("CSV Editor")
 #Menu bar
 menubar = tk.Menu(master)
 filemenu = tk.Menu(menubar, tearoff=0)
+filemenu.add_command(label="New",command=newTableInput)
 filemenu.add_command(label="Import",command=chooseFile)
 filemenu.add_command(label="Export",command=lambda:exportFileData(filename))
 menubar.add_cascade(label="File", menu=filemenu)
