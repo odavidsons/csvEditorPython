@@ -3,6 +3,9 @@ Application for managing CSV files.
 Features:
 -Import CSV file and display the data in a table
 -Edit the data in the table and export the new file
+-Create a new empty table with custom size
+
+Made in 2023 by David Santos - https://github.com/odavidsons/csvEditorPython
 
 """
 import csv
