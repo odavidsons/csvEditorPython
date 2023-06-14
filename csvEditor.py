@@ -18,7 +18,7 @@ def chooseFile():
     )
     filename = fd.askopenfilename(
         title='Open a file',
-        initialdir='/home/dsantos/Documentos',
+        initialdir='/',
         filetypes=filetypes)
     if len(filename) > 0: importFileData(filename)
 
@@ -60,59 +60,71 @@ def importFileData(filename):
         tk.messagebox.showwarning(message="Clear the loaded file first!")
 
 def exportFileData(filename):
-    if filename != "":
+    if len(canvas.find_all()) > 0:
         new_tableCells = []
         #Update the new_tableCells array with the current values on the input boxes of the cells
-        canvas_cells = canvas.find_all
         for i in range(len(tableCells)):
             new_tableCells.append([])
             for j in range(len(tableCells[i])):
                 new_tableCells[i].append([])
                 new_tableCells[i][j] = tableCells[i][j].get()
-        saveFile = open(filename,'w',newline='')
+
+        filetypes = (
+        ('CSV files', '*.csv'),
+        ('All files', '*.*')
+        )
+        filename = fd.asksaveasfile(mode='w',filetypes=filetypes)
+        print(filename.name)
+        saveFile = open(filename.name,'w',newline='')
         writer = csv.writer(saveFile)
-        writer.writerow(header)
         for i in range(len(new_tableCells)):
             writer.writerow(new_tableCells[i])
         print(new_tableCells)
         tk.messagebox.showinfo("Information","File exported successfully!")
-    else: errorLabel.config(text="You haven't imported a file yet!",foreground="red")
+    else: errorLabel.config(text="You haven't imported a file or created a table!",foreground="red")
 
 #Create a window the inputing the value for the new table size
 def newTableInput():
     global sizeSelection
 
-    #Elements for the input information
-    sizeSelection = tk.Toplevel(master)
-    sizeSelection.minsize(200,100)
-    label1 = tk.Label(sizeSelection,text="Select the table size")
-    label1.grid(row=0,column=0,columnspan=2)
-    labelWidth = tk.Label(sizeSelection,text="Width: ")
-    labelWidth.grid(row=1,column=0)
-    widthInput = tk.Entry(sizeSelection)
-    widthInput.grid(row=1,column=1,padx=5,pady=5)
-    labelHeight = tk.Label(sizeSelection,text="Height: ")
-    labelHeight.grid(row=2,column=0)
-    heightInput = tk.Entry(sizeSelection)
-    heightInput.grid(row=2,column=1)
-    confirmBtn = tk.Button(sizeSelection,text="Ok",command=lambda: newTableRender(heightInput.get(),widthInput.get()))
-    confirmBtn.grid(row=3,column=0,columnspan=2)
+    if len(canvas.find_all()) == 0:
+        #Elements for the input information
+        sizeSelection = tk.Toplevel(master)
+        sizeSelection.minsize(200,100)
+        label1 = tk.Label(sizeSelection,text="Select the table size")
+        label1.grid(row=0,column=0,columnspan=2)
+        labelWidth = tk.Label(sizeSelection,text="Width: ")
+        labelWidth.grid(row=1,column=0)
+        widthInput = tk.Entry(sizeSelection)
+        widthInput.grid(row=1,column=1,padx=5,pady=5)
+        labelHeight = tk.Label(sizeSelection,text="Height: ")
+        labelHeight.grid(row=2,column=0)
+        heightInput = tk.Entry(sizeSelection)
+        heightInput.grid(row=2,column=1)
+        confirmBtn = tk.Button(sizeSelection,text="Ok",command=lambda: newTableRender(heightInput.get(),widthInput.get()))
+        confirmBtn.grid(row=3,column=0,columnspan=2)
+    else: errorLabel.config(text="You have a table opened. Clear it first",foreground="red")
 
 #Render a new table with the specified size
 def newTableRender(height,width):
+    global tableCells
+    
     try:
+        tableCells = []
         #Create the table canvas
         canvas.create_window(0, 0, window=scrollable_frame, anchor="nw")
         canvas.configure(yscrollcommand=vscrollbar.set)
         canvas.configure(xscrollcommand=hscrollbar.set)
         #Render the cells
         for i in range(int(height)):
+            tableCells.append([])
             for j in range(int(width)):
+                tableCells[i].append([])
                 cell = tk.Entry(scrollable_frame)
                 cell.grid(row=i+3,column=j)
+                tableCells[i][j] = cell
         sizeSelection.destroy()
     except ValueError: tk.messagebox.showwarning(message="Please enter a valid number")
-
 
 def clearTable():
     global tableCells
