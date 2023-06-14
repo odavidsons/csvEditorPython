@@ -29,8 +29,7 @@ def importFileData(filename):
     if len(tableCells) == 0:
         #Create the table canvas
         canvas.create_window(0, 0, window=scrollable_frame, anchor="nw")
-        canvas.configure(yscrollcommand=vscrollbar.set)
-        canvas.configure(xscrollcommand=hscrollbar.set)
+        canvas.configure(yscrollcommand=vscrollbar.set,xscrollcommand=hscrollbar.set)
 
         with open(filename, newline='') as csvfile:
             errorLabel.config(text="",foreground="red") #Clear error message
@@ -79,7 +78,6 @@ def exportFileData(filename):
         writer = csv.writer(saveFile)
         for i in range(len(new_tableCells)):
             writer.writerow(new_tableCells[i])
-        print(new_tableCells)
         tk.messagebox.showinfo("Information","File exported successfully!")
     else: errorLabel.config(text="You haven't imported a file or created a table!",foreground="red")
 
@@ -113,8 +111,7 @@ def newTableRender(height,width):
         tableCells = []
         #Create the table canvas
         canvas.create_window(0, 0, window=scrollable_frame, anchor="nw")
-        canvas.configure(yscrollcommand=vscrollbar.set)
-        canvas.configure(xscrollcommand=hscrollbar.set)
+        canvas.configure(yscrollcommand=vscrollbar.set,xscrollcommand=hscrollbar.set)
         #Render the cells
         for i in range(int(height)):
             tableCells.append([])
@@ -163,12 +160,7 @@ hscrollbar = tk.Scrollbar(container, orient="horizontal", command=canvas.xview)
 scrollable_frame = tk.Frame(canvas)
 
 #Bind the scrollregion to the frame
-scrollable_frame.bind(
-            "<Configure>",
-            lambda e: canvas.configure(
-                scrollregion=canvas.bbox("all")
-            )
-        )
+scrollable_frame.bind("<Configure>",lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
 
 #Top labels/buttons
 errorLabel = tk.Label(master,text="")
