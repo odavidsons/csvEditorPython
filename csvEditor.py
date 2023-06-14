@@ -8,6 +8,7 @@ Features:
 import csv
 import tkinter as tk
 from tkinter import filedialog as fd
+import webbrowser
 
 #Open a file selection box
 def chooseFile():
@@ -29,8 +30,7 @@ def importFileData(filename):
     if len(tableCells) == 0:
         #Create the table canvas
         canvas.create_window(0, 0, window=scrollable_frame, anchor="nw")
-        canvas.configure(yscrollcommand=vscrollbar.set)
-        canvas.configure(xscrollcommand=hscrollbar.set)
+        canvas.configure(yscrollcommand=vscrollbar.set,xscrollcommand=hscrollbar.set)
 
         with open(filename, newline='') as csvfile:
             errorLabel.config(text="",foreground="red") #Clear error message
@@ -60,6 +60,8 @@ def importFileData(filename):
         tk.messagebox.showwarning(message="Clear the loaded file first!")
 
 def exportFileData(filename):
+    global header
+
     if len(canvas.find_all()) > 0:
         new_tableCells = []
         #Update the new_tableCells array with the current values on the input boxes of the cells
@@ -77,9 +79,10 @@ def exportFileData(filename):
         print(filename.name)
         saveFile = open(filename.name,'w',newline='')
         writer = csv.writer(saveFile)
+        if len(header)>0:
+            writer.writerow(header)
         for i in range(len(new_tableCells)):
             writer.writerow(new_tableCells[i])
-        print(new_tableCells)
         tk.messagebox.showinfo("Information","File exported successfully!")
     else: errorLabel.config(text="You haven't imported a file or created a table!",foreground="red")
 
@@ -107,14 +110,14 @@ def newTableInput():
 
 #Render a new table with the specified size
 def newTableRender(height,width):
-    global tableCells
+    global tableCells,header
     
     try:
         tableCells = []
+        header = []
         #Create the table canvas
         canvas.create_window(0, 0, window=scrollable_frame, anchor="nw")
-        canvas.configure(yscrollcommand=vscrollbar.set)
-        canvas.configure(xscrollcommand=hscrollbar.set)
+        canvas.configure(yscrollcommand=vscrollbar.set,xscrollcommand=hscrollbar.set)
         #Render the cells
         for i in range(int(height)):
             tableCells.append([])
@@ -127,11 +130,17 @@ def newTableRender(height,width):
     except ValueError: tk.messagebox.showwarning(message="Please enter a valid number")
 
 def clearTable():
-    global tableCells
+    global tableCells,header
 
-    canvas.delete('all')
+    canvas.delete("all")
+    for widgets in scrollable_frame.winfo_children():
+        widgets.destroy()
     tableCells = []
+    header = []
     errorLabel.config(text="Table cleared!",foreground="black")
+
+def callback(url):
+    webbrowser.open_new(url)
 
 #Main program
 filename = ""
@@ -152,23 +161,19 @@ menubar.add_command(label="Clear",command=clearTable)
 menubar.add_command(label="Exit",command=master.quit)
 master.config(menu=menubar)
 
-topLabel = tk.Label(master,text="Made by David Santos")
+topLabel = tk.Label(master,text="Made by: David Santos",foreground="blue",cursor="hand2")
 topLabel.grid(row=0,column=0)
+topLabel.bind("<Button-1>", lambda e: callback("https://github.com/odavidsons"))
 
 #Render container and canvas for the datatable
 container = tk.Frame(master)
 canvas = tk.Canvas(container, width=1000, height=600)
-vscrollbar = tk.Scrollbar(container, orient="vertical", command=canvas.yview)
-hscrollbar = tk.Scrollbar(container, orient="horizontal", command=canvas.xview)
+vscrollbar = tk.Scrollbar(master, orient="vertical", command=canvas.yview)
+hscrollbar = tk.Scrollbar(master, orient="horizontal", command=canvas.xview)
 scrollable_frame = tk.Frame(canvas)
 
 #Bind the scrollregion to the frame
-scrollable_frame.bind(
-            "<Configure>",
-            lambda e: canvas.configure(
-                scrollregion=canvas.bbox("all")
-            )
-        )
+scrollable_frame.bind("<Configure>",lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
 
 #Top labels/buttons
 errorLabel = tk.Label(master,text="")
