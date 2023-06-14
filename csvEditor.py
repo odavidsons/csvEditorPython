@@ -8,6 +8,7 @@ Features:
 import csv
 import tkinter as tk
 from tkinter import filedialog as fd
+import webbrowser
 
 #Open a file selection box
 def chooseFile():
@@ -130,6 +131,9 @@ def clearTable():
     tableCells = []
     errorLabel.config(text="Table cleared!",foreground="black")
 
+def callback(url):
+    webbrowser.open_new(url)
+
 #Main program
 filename = ""
 header = []
@@ -149,8 +153,9 @@ menubar.add_command(label="Clear",command=clearTable)
 menubar.add_command(label="Exit",command=master.quit)
 master.config(menu=menubar)
 
-topLabel = tk.Label(master,text="Made by David Santos")
+topLabel = tk.Label(master,text="Made by: David Santos",foreground="blue",cursor="hand2")
 topLabel.grid(row=0,column=0)
+topLabel.bind("<Button-1>", lambda e: callback("https://github.com/odavidsons"))
 
 #Render container and canvas for the datatable
 container = tk.Frame(master)
