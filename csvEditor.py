@@ -94,6 +94,7 @@ def newTableInput():
         #Create new window
         sizeSelection = tk.Toplevel(master)
         sizeSelection.minsize(200,100)
+        #Center relative to the master window
         win_x = master.winfo_rootx() + 400
         win_y = master.winfo_rooty() + 100
         sizeSelection.geometry(f'+{win_x}+{win_y}')
