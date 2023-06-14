@@ -60,6 +60,8 @@ def importFileData(filename):
         tk.messagebox.showwarning(message="Clear the loaded file first!")
 
 def exportFileData(filename):
+    global header
+
     if len(canvas.find_all()) > 0:
         new_tableCells = []
         #Update the new_tableCells array with the current values on the input boxes of the cells
@@ -77,6 +79,8 @@ def exportFileData(filename):
         print(filename.name)
         saveFile = open(filename.name,'w',newline='')
         writer = csv.writer(saveFile)
+        if len(header)>0:
+            writer.writerow(header)
         for i in range(len(new_tableCells)):
             writer.writerow(new_tableCells[i])
         tk.messagebox.showinfo("Information","File exported successfully!")
@@ -106,10 +110,11 @@ def newTableInput():
 
 #Render a new table with the specified size
 def newTableRender(height,width):
-    global tableCells
+    global tableCells,header
     
     try:
         tableCells = []
+        header = []
         #Create the table canvas
         canvas.create_window(0, 0, window=scrollable_frame, anchor="nw")
         canvas.configure(yscrollcommand=vscrollbar.set,xscrollcommand=hscrollbar.set)
@@ -125,10 +130,13 @@ def newTableRender(height,width):
     except ValueError: tk.messagebox.showwarning(message="Please enter a valid number")
 
 def clearTable():
-    global tableCells
+    global tableCells,header
 
-    canvas.delete('all')
+    canvas.delete("all")
+    for widgets in scrollable_frame.winfo_children():
+        widgets.destroy()
     tableCells = []
+    header = []
     errorLabel.config(text="Table cleared!",foreground="black")
 
 def callback(url):
